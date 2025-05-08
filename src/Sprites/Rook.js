@@ -9,25 +9,29 @@ class Rook {
             "rook"
         ).setScale(0.25);
 
-        this.speed = 2 + Math.random();
-        this.lastShotTime = 0;
-        this.shootInterval = 2000; // 3 seconds
+        this.stepSize = 10;
+        this.stepInterval = 200; // ms between "blip" moves
+        this.lastStepTime = 0;
+
+        this.lastShotTime = 0;                  
+        this.shootInterval = 2000;
     }
 
     update(time) {
         if (!this.sprite || !this.sprite.active) return;
 
-        if (this.movingRight) {
-            this.sprite.x += this.speed;
-        } else {
-            this.sprite.x -= this.speed;
+        // Blip movement
+        if (time > this.lastStepTime + this.stepInterval) {
+            this.sprite.x += this.movingRight ? this.stepSize : -this.stepSize;
+            this.lastStepTime = time;
         }
 
+        // Reset position if off screen
         if (this.sprite.x > this.scene.game.config.width + 50 || this.sprite.x < -50) {
             this.reset();
         }
 
-        // Shoot bullet every 3 seconds
+        // Shoot bullet
         if (time > this.lastShotTime + this.shootInterval) {
             this.shoot();
             this.lastShotTime = time;
@@ -48,7 +52,6 @@ class Rook {
         this.sprite.y = Math.random() * 100;
         this.movingRight = Math.random() < 0.5;
         this.sprite.x = this.movingRight ? -50 : this.scene.game.config.width + 50;
-        this.speed = 2 + Math.random();
     }
 
     destroy() {
